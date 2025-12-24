@@ -9,7 +9,9 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 
 
 # Optional: set a fixed window size for testing on desktop
-Window.size = (400, 600)
+# Window.size = (400, 600)
+
+# Paddle class with graphics and position binding
 
 class Paddle(Widget):
     def __init__(self, **kwargs):
@@ -23,6 +25,7 @@ class Paddle(Widget):
         self.rect.pos = self.pos
         self.rect.size = self.size
 
+# Ball class with velocity properties and move method
 class Ball(Widget):
     vx = NumericProperty(0)
     vy = NumericProperty(0)
@@ -41,6 +44,7 @@ class Ball(Widget):
     def move(self):
         self.pos = Vector(*self.velocity) + self.pos
 
+# Brick class with color and position binding
 class Brick(Widget):
     def __init__(self, color=(0, 0, 1), **kwargs):
         super().__init__(**kwargs)
@@ -52,6 +56,8 @@ class Brick(Widget):
     def update_graphics_pos(self, *args):
         self.rect.pos = self.pos
         self.rect.size = self.size
+    
+# Main game widget, handles game logic and updates, and handles touch events. Touch events are used to move the paddle.
 
 class BreakoutGame(Widget):
     def __init__(self, **kwargs):
@@ -106,22 +112,22 @@ class BreakoutGame(Widget):
     def update(self, dt):
         self.ball.move()
 
-        # Bounce off walls
+        # Bounce off walls. This is done by reversing the velocity component.
         if self.ball.x < 0 or self.ball.right > self.width:
             self.ball.vx *= -1
         if self.ball.top > self.height:
             self.ball.vy *= -1
 
-        # Ball falls below screen
+        # Ball falls below screen. This is accomplished by resetting the ball's position and velocity.
         if self.ball.y < 0:
             self.ball.center = self.center
             self.ball.velocity = Vector(12, 12)
 
-        # Bounce off paddle
+        # Bounce off paddle, again by reversing the velocity component.
         if self.ball.collide_widget(self.paddle):
             self.ball.vy *= -1
 
-        # Bounce off bricks
+        # Bounce off bricks. I used a copy of the bricks list to avoid modifying the list while iterating over it.
         for brick in self.bricks[:]:
             if self.ball.collide_widget(brick):
                 self.ball.vy *= -1
